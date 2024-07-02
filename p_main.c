@@ -17,6 +17,7 @@ t_ph *init_philos(t_data *data)
 		philos[i].r_fork = &data->forks[(i + 1) % data->num ];
 		philos[i].l_mutex = &data->fork_mutex[i];
 		philos[i].r_mutex = &data->fork_mutex[(i + 1) % data->num];
+		philos[i].eat_mutex = &data->eat_mutex[i];
 		philos[i].last_eat_time = 0;
 		philos[i].alive = &data->alive;
 		philos[i].start_time = data->start_time;
@@ -54,11 +55,13 @@ int init_data(int argc, char *argv[], t_data *data)
 
 	data->forks = malloc(sizeof(int) * data->num);
 	data->fork_mutex = malloc(sizeof(pthread_mutex_t) * data->num);
+	data->eat_mutex = malloc(sizeof(pthread_mutex_t) * data->num);
 	for (int i = 0; i < data->num; i++)
 	{
 		// data->forks[i] = i;
 		data->forks[i] = -1;
 		pthread_mutex_init(&data->fork_mutex[i], NULL);
+		pthread_mutex_init(&data->eat_mutex[i], NULL);
 	}
 
 	data->philos = init_philos(data);
@@ -72,9 +75,11 @@ void *philo(void *data)
     pthread_mutex_lock(philo->start_mutex);
     pthread_mutex_unlock(philo->start_mutex);
 
-	pthread_mutex_lock(philo->dead_mutex);
+			// printf("%d is ready\n", philo->id);
+	pthread_mutex_lock(philo->eat_mutex);
 	philo->last_eat_time = get_current_time();
-	pthread_mutex_unlock(philo->dead_mutex);
+	philo->start_time = get_current_time();
+	pthread_mutex_unlock(philo->eat_mutex);
 
 	if (philo->id % 2 == 0)
 		ft_usleep(10, philo);
@@ -84,22 +89,15 @@ void *philo(void *data)
 		pthread_mutex_lock(philo->dead_mutex);
 		if (*philo->alive == 0)
 		{
-			printf("%d is dead\n", philo->id);
+			pthread_mutex_unlock(philo->dead_mutex);
             break;
 		}
 		pthread_mutex_unlock(philo->dead_mutex);
-		// printf("dead_mutex 2\n");
-
-        if (philo->must_eat == 0)
-		{
-			printf("[%d] must_eat\n", philo->id);
-            break;
-		}
         ph_eat(philo);
 		pthread_mutex_lock(philo->dead_mutex);
-				if (*philo->alive == 0)
+		if (*philo->alive == 0)
 		{
-			printf("%d is dead\n", philo->id);
+			pthread_mutex_unlock(philo->dead_mutex);
             break;
 		}
 		pthread_mutex_unlock(philo->dead_mutex);
@@ -117,14 +115,14 @@ void *monitoring(void *arg)
 	pthread_mutex_unlock(&data->start_mutex);
 	while (1)
 	{
-	pthread_mutex_lock(&data->dead_mutex);
-		printf("monitoring\n");
+	// pthread_mutex_lock(&data->dead_mutex);
+		// printf("monitoring\n");
 
 		if(check_dead_philo(data))
 			break ;
-	pthread_mutex_unlock(&data->dead_mutex);
+	// pthread_mutex_unlock(&data->dead_mutex);
 	
-	ft_usleep(100, &data->philos[0]);
+	ft_usleep(50, &data->philos[0]);
 	}
 			printf("monitoring done\n");
 
@@ -155,8 +153,11 @@ void make_thread(t_data *data)
 		printf("Error: unable to join thread\n");
 		return;
 	}
+	printf("Success monitoring\n");
 	for (int i = 0; i < data->num; i++)
 	{
+	// printf("Success [%d]\n",);
+
 		if (pthread_join(data->philos[i].thread, NULL))
 		{
             printf("Error: unable to join thread\n");

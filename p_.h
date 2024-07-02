@@ -6,7 +6,7 @@
 /*   By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/27 16:43:57 by jimchoi           #+#    #+#             */
-/*   Updated: 2024/07/01 21:35:39 by jimchoi          ###   ########.fr       */
+/*   Updated: 2024/07/02 11:10:24 by jimchoi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef struct s_ph
 	
 	pthread_mutex_t *start_mutex;
 	pthread_mutex_t *dead_mutex;
+	pthread_mutex_t *eat_mutex;
 	pthread_mutex_t *write_mutex;
 	pthread_t thread;
 
@@ -58,6 +59,7 @@ typedef struct s_data
 
 	int *forks;
 	pthread_mutex_t *fork_mutex;
+	pthread_mutex_t *eat_mutex;
 
 	t_ph *philos;
 
