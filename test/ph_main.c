@@ -1,4 +1,3 @@
-
 #include "p_.h"
 
 
@@ -21,7 +20,7 @@ t_ph *init_philos(t_data *data)
 		philos[i].eat_mutex = &data->eat_mutex[i];
 		philos[i].last_eat_time = 0;
 		philos[i].alive = &data->alive;
-		philos[i].start_time = data->start_time;
+		// philos[i].start_time = data->start_time;
 		philos[i].time_to_die = data->time_to_die;
 		philos[i].time_to_eat = data->time_to_eat;
 		philos[i].time_to_sleep = data->time_to_sleep;
@@ -30,7 +29,6 @@ t_ph *init_philos(t_data *data)
 		philos[i].start_mutex = &data->start_mutex;
 		philos[i].dead_mutex = &data->dead_mutex;
 		philos[i].write_mutex = &data->write_mutex;
-		philos[i].start_time = data->start_time;
 		i++;
 	}
 	// *philos[5].l_fork = 100;
@@ -79,12 +77,11 @@ void *philo(void *data)
 
 			// printf("%d is ready\n", philo->id);
 	pthread_mutex_lock(philo->eat_mutex);
-	philo->last_eat_time = get_current_time();
-	// philo->start_time = get_current_time();
+	philo->start_time = get_current_time();
 	pthread_mutex_unlock(philo->eat_mutex);
 
 	if (philo->id % 2 == 0)
-		usleep(philo->time_to_eat * 1000);
+		ft_usleep(10, philo);
     while (1)
     {
 
@@ -105,7 +102,7 @@ void *philo(void *data)
 		pthread_mutex_unlock(philo->dead_mutex);
         ph_sleep(philo);
         ph_think(philo);
-		usleep(400);
+		usleep(200);
     }
     return (NULL);
 }
@@ -118,10 +115,15 @@ void *monitoring(void *arg)
 	pthread_mutex_unlock(&data->start_mutex);
 	while (1)
 	{
+	// pthread_mutex_lock(&data->dead_mutex);
+		// printf("monitoring\n");
+
 		if(check_dead_philo(data))
 			break ;
-		// ft_usleep(1, &data->philos[0]);
-		usleep(300);
+	// pthread_mutex_unlock(&data->dead_mutex);
+	
+	usleep(200);
+
 	}
 			printf("monitoring done\n");
 
@@ -146,11 +148,12 @@ void make_thread(t_data *data)
         }
 	}
 	pthread_mutex_unlock(&data->start_mutex);
-		if(pthread_join(monitor, NULL))
-		{
-			printf("Error: unable to join thread\n");
-			return;
-		}
+
+	if(pthread_join(monitor, NULL))
+	{
+		printf("Error: unable to join thread\n");
+		return;
+	}
 	printf("Success monitoring\n");
 	for (int i = 0; i < data->num; i++)
 	{

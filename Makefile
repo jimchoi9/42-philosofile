@@ -3,15 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: sabyun <sabyun@student.42seoul.kr>         +#+  +:+       +#+         #
+#    By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/22 11:45:19 by jimchoi           #+#    #+#              #
-#    Updated: 2024/07/02 15:31:51 by sabyun           ###   ########.fr        #
+#    Updated: 2024/07/03 19:53:57 by jimchoi          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = cc
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS =
+#  -Wall -Werror -Wextra
 NAME = philosophers
 
 ifdef DEBUG
@@ -21,7 +22,7 @@ ifdef DEBUG_S
 	CFLAGS += -g3 -fsanitize=address
 endif
 
-SRCS = p_mian.c p_utils.c 
+SRCS = p_main.c p_utils.c 
 # philo.c philo_utils.c
 
 OBJS = $(SRCS:.c=.o)
