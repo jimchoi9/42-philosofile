@@ -3,16 +3,15 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+         #
+#    By: sabyun <sabyun@student.42seoul.kr>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/22 11:45:19 by jimchoi           #+#    #+#              #
-#    Updated: 2024/07/02 13:01:04 by jimchoi          ###   ########.fr        #
+#    Updated: 2024/07/02 15:31:51 by sabyun           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = cc
-CFLAGS = 
-#-Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra
 NAME = philosophers
 
 ifdef DEBUG
@@ -27,13 +26,14 @@ SRCS = p_mian.c p_utils.c
 
 OBJS = $(SRCS:.c=.o)
 
-all: $(NAME)
 
 %.o: %.c
 	$(CC) $(CFLAGS)  -c $< -o $@ 
 
+all: $(NAME)
+
 $(NAME): $(OBJS)
-	$(CC)  $(CFLAGS) -o $@ $(OBJS)
+	$(CC)  $(CFLAGS) $(OBJS) -o $(NAME)
 
 clean:
 	rm -rf $(OBJS)
