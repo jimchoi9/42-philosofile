@@ -70,7 +70,7 @@ int	check_dead_philo(t_data *data)
 			return (1);
 		}
 		i++;
-		usleep(300);
+		usleep(200);
 	}
 	pthread_mutex_unlock(&data->dead_mutex);
 	return (0);
@@ -137,13 +137,13 @@ void ph_eat(t_ph *philo)
 		philo->last_eat_time = get_current_time();
 		pthread_mutex_unlock(philo->eat_mutex);
 		ft_usleep(philo->time_to_eat, philo);
-		*philo->l_fork = -1;
-		*philo->r_fork = -1;
-		
 		pthread_mutex_lock(philo->eat_mutex);
 		if (philo->must_eat > 0)
 			philo->must_eat--;
 		pthread_mutex_unlock(philo->eat_mutex);
+		*philo->l_fork = -1;
+		*philo->r_fork = -1;
+		
 	}
 	pthread_mutex_unlock(philo->r_mutex);
 	pthread_mutex_unlock(philo->l_mutex);

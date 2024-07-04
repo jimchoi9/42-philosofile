@@ -6,7 +6,7 @@
 /*   By: jimchoi <jimchoi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 17:16:39 by jimchoi           #+#    #+#             */
-/*   Updated: 2024/07/04 18:18:28 by jimchoi          ###   ########.fr       */
+/*   Updated: 2024/07/04 19:38:06 by jimchoi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ void *philo(void *data)
     pthread_mutex_unlock(philo->start_mutex);
 
 	if (philo->id % 2 == 0)
-		usleep(philo->time_to_eat * 500);
+		usleep(2500);
     while (1)
     {
 		pthread_mutex_lock(philo->dead_mutex);
@@ -153,7 +153,8 @@ void make_thread(t_data *data)
 	for (int i = 0; i < data->num; i++)
 	{
 
-		if (pthread_join(data->philos[i].thread, NULL))
+		// if (pthread_join(data->philos[i].thread, NULL))
+		if (pthread_detach(data->philos[i].thread))
 		{
             printf("Error: unable to join thread\n");
             return;
