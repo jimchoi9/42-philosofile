@@ -3,17 +3,17 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+         #
+#    By: jimchoi <jimchoi@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/22 11:45:19 by jimchoi           #+#    #+#              #
-#    Updated: 2024/07/03 19:53:57 by jimchoi          ###   ########.fr        #
+#    Updated: 2024/07/04 17:22:09 by jimchoi          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = cc
 CFLAGS =
 #  -Wall -Werror -Wextra
-NAME = philosophers
+NAME = philo
 
 ifdef DEBUG
 	CFLAGS += -g3 -fsanitize=thread
@@ -23,10 +23,8 @@ ifdef DEBUG_S
 endif
 
 SRCS = p_main.c p_utils.c 
-# philo.c philo_utils.c
 
 OBJS = $(SRCS:.c=.o)
-
 
 %.o: %.c
 	$(CC) $(CFLAGS)  -c $< -o $@ 
