@@ -49,20 +49,33 @@ int	check_dead_philo(t_data *data)
 		pthread_mutex_lock(data->philos[i].eat_mutex);
 		if (data->philos[i].last_eat_time != 0 && get_current_time() - data->philos[i].last_eat_time > data->time_to_die)
 		{
-			// pthread_mutex_unlock(data->philos[i].eat_mutex);
 			pthread_mutex_lock(data->philos[i].dead_mutex);
 			data->alive = 0;
 			pthread_mutex_unlock(data->philos[i].dead_mutex);
 			ph_write(&data->philos[i], DEAD);
 			return (1);
 		}
-		// pthread_mutex_lock(data->philos[i].eat_mutex);
+		pthread_mutex_unlock(data->philos[i].eat_mutex);
+		i++;
+		usleep(200);
+	}
+	pthread_mutex_unlock(&data->dead_mutex);
+	return (0);
+}
+int	check_eat_philo(t_data *data)
+{
+	int i;
+	int count = 0;;
+
+	i=0;
+	while (i < data->num)
+	{
+		pthread_mutex_lock(data->philos[i].eat_mutex);
 		if (data->philos[i].must_eat == 0)
 			count++;
 		pthread_mutex_unlock(data->philos[i].eat_mutex);
 		if (count == data->num)
 		{
-			printf("checking all ate\n");
 			pthread_mutex_lock(&data->dead_mutex);
 			data->alive = 0;
 			pthread_mutex_unlock(&data->dead_mutex);
@@ -109,7 +122,6 @@ int ph_take(t_ph *philo)
 		return (1);
 	}
 	pthread_mutex_unlock(philo->r_mutex);
-
 	pthread_mutex_lock(philo->l_mutex);
 	if (*philo->l_fork == -1)
 	{
@@ -136,14 +148,13 @@ void ph_eat(t_ph *philo)
 		pthread_mutex_lock(philo->eat_mutex);
 		philo->last_eat_time = get_current_time();
 		pthread_mutex_unlock(philo->eat_mutex);
-		ft_usleep(philo->time_to_eat, philo);
 		pthread_mutex_lock(philo->eat_mutex);
 		if (philo->must_eat > 0)
 			philo->must_eat--;
 		pthread_mutex_unlock(philo->eat_mutex);
+		ft_usleep(philo->time_to_eat, philo);
 		*philo->l_fork = -1;
 		*philo->r_fork = -1;
-		
 	}
 	pthread_mutex_unlock(philo->r_mutex);
 	pthread_mutex_unlock(philo->l_mutex);
