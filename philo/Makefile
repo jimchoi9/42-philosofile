@@ -6,13 +6,12 @@
 #    By: jimchoi <jimchoi@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/22 11:45:19 by jimchoi           #+#    #+#              #
-#    Updated: 2024/07/08 13:17:20 by jimchoi          ###   ########.fr        #
+#    Updated: 2024/07/08 14:15:27 by jimchoi          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = cc
-CFLAGS =
-#  -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra
 NAME = philo
 
 ifdef DEBUG

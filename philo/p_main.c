@@ -6,18 +6,16 @@
 /*   By: jimchoi <jimchoi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 17:16:39 by jimchoi           #+#    #+#             */
-/*   Updated: 2024/07/08 13:52:58 by jimchoi          ###   ########.fr       */
+/*   Updated: 2024/07/08 14:36:26 by jimchoi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "p_.h"
+#include "philo.h"
 
-t_ph *init_philos(t_data *data)
+t_ph *init_philos(t_data *data, int i)
 {
 	t_ph	*philos;
-	int i;
-	
-	i = -1;
+
 	philos = malloc(sizeof(t_ph) * data->num);
 	philos = memset(philos, 0, sizeof(t_ph ) * data->num);
 	while (++i < data->num )
@@ -67,7 +65,7 @@ int init_data(int argc, char *argv[], t_data *data, int i)
 		pthread_mutex_init(&data->fork_mutex[i], NULL);
 		pthread_mutex_init(&data->eat_mutex[i], NULL);
 	}
-	data->philos = init_philos(data);
+	data->philos = init_philos(data, -1);
 	return (0);
 }
 
@@ -79,7 +77,7 @@ void *philo(void *data)
     pthread_mutex_unlock(philo->start_mutex);
 
 	if (philo->id % 2 == 0)
-		usleep(philo->time_to_eat * 1000);// check
+		usleep(philo->time_to_eat * 1000);
 	while (1)
 	{
 		pthread_mutex_lock(philo->dead_mutex);
@@ -108,51 +106,36 @@ void *monitoring(void *arg)
 	pthread_mutex_unlock(&data->start_mutex);
 	while (1)
 	{
-		// if(check_dead_philo(data))
 		if(check_dead_philo(data) || check_eat_philo(data))
 			break ;
-		usleep(200);
+		usleep(400);
 	}
-			printf("monitoring done\n");
 	return (NULL);
 }
-void make_thread(t_data *data)
+int make_thread(t_data *data)
 {
 	pthread_t monitor;
+	int i;
 
+	i = -1;
 	pthread_mutex_lock(&data->start_mutex);
 	if (pthread_create(&monitor, NULL, &monitoring, data))
-	{
-        printf("Error: unable to create thread\n");
-        return;
-    }
-	for (int i = 0; i < data->num; i++)
+        return(printf("Error: unable to create thread\n"));
+	while (++i < data->num)
 	{
 		if(pthread_create(&data->philos[i].thread, NULL, &philo, &data->philos[i]))
-		{
-            printf("Error: unable to create thread\n");
-            return;
-        }
+			return(printf("Error: unable to create thread\n"));
 	}
 	pthread_mutex_unlock(&data->start_mutex);
-		if(pthread_join(monitor, NULL))
-		{
-			printf("Error: unable to join thread\n");
-			return;
-		}
-	printf("Success monitoring\n");
-	printf("alive: %d\n", data->alive);
-	for (int i = 0; i < data->num; i++)
+		if(pthread_join(monitor, NULL) != 0)
+			return(printf("Error: unable to join thread\n"));
+	i = -1;
+	while (++i < data->num)
 	{
-
-		// if (pthread_detach(data->philos[i].thread))
 		if (pthread_join(data->philos[i].thread, NULL))
-		{
-            printf("Error: unable to join thread\n");
-            return;
-        }
+			return(printf("Error: unable to join thread\n"));
 	}
-	
+	return (0);
 }
 
 void check_leaks(void)

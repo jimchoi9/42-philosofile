@@ -1,14 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   p_.h                                               :+:      :+:    :+:   */
+/*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+        */
+/*   By: jimchoi <jimchoi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/27 16:43:57 by jimchoi           #+#    #+#             */
-/*   Updated: 2024/07/05 17:28:29 by jimchoi          ###   ########.fr       */
+/*   Updated: 2024/07/08 14:02:44 by jimchoi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#ifndef PHILO_H
+# define PHILO_H
+
 
 #include <pthread.h>
 #include <stdio.h>
@@ -75,13 +79,14 @@ typedef struct s_data
 
 long long	philo_atoi(const char *str);
 double		get_current_time();
-int			check_dead_philo(t_data *data);
-void		ft_usleep(int ms, t_ph *philo);
+void		ph_usleep(int ms, t_ph *philo);
 void 		ph_eat(t_ph *philo);
-void		 ph_sleep(t_ph *philo);
+void		ph_sleep(t_ph *philo);
 void		ph_think(t_ph *philo);
-void free_thread(t_data *data);
-void    ph_write(t_ph *philo, t_flag flag);
-int ph_take(t_ph *philo);
-int	check_eat_philo(t_data *data);
+void		ph_write(t_ph *philo, t_flag flag);
+int			ph_take(t_ph *philo);
+int			check_dead_philo(t_data *data);
+int			check_eat_philo(t_data *data);
+void		free_thread(t_data *data);
 
+#endif

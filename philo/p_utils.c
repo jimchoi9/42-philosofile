@@ -1,4 +1,4 @@
-#include "p_.h"
+#include "philo.h"
 
 long long	philo_atoi(const char *str)
 {
@@ -57,7 +57,7 @@ int	check_dead_philo(t_data *data)
 		}
 		pthread_mutex_unlock(data->philos[i].eat_mutex);
 		i++;
-		usleep(200);
+		usleep(400);
 	}
 	return (0);
 }
@@ -66,7 +66,7 @@ int	check_eat_philo(t_data *data)
 	int i;
 	int count = 0;
 
-	i=0;
+	i = 0;
 	while (i < data->num)
 	{
 		pthread_mutex_lock(data->philos[i].eat_mutex);
@@ -86,7 +86,7 @@ int	check_eat_philo(t_data *data)
 	return (0);
 }
 
-void	ft_usleep(int ms, t_ph *philo)
+void	ph_usleep(int ms, t_ph *philo)
 {
 	double	start;
 	int	is_alive = 1;
@@ -134,7 +134,7 @@ void ph_eat(t_ph *philo)
 		if (philo->must_eat > 0)
 			philo->must_eat--;
 		pthread_mutex_unlock(philo->eat_mutex);
-		ft_usleep(philo->time_to_eat, philo);
+		ph_usleep(philo->time_to_eat, philo);
 		*philo->l_fork = -1;
 		*philo->r_fork = -1;
 	}
@@ -145,7 +145,7 @@ void ph_eat(t_ph *philo)
 void ph_sleep(t_ph *philo)
 {
 	ph_write(philo, SLEEP);
-	ft_usleep(philo->time_to_sleep, philo);
+	ph_usleep(philo->time_to_sleep, philo);
 
 }
 
