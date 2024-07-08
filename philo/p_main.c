@@ -6,7 +6,7 @@
 /*   By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 17:16:39 by jimchoi           #+#    #+#             */
-/*   Updated: 2024/07/05 17:41:45 by jimchoi          ###   ########.fr       */
+/*   Updated: 2024/07/08 12:12:01 by jimchoi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,6 +154,7 @@ void make_thread(t_data *data)
 	}
 	
 }
+
 void check_leaks(void)
 {
 	system ("leaks philo");

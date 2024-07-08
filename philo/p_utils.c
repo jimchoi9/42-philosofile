@@ -41,7 +41,7 @@ double	get_current_time()
 int	check_dead_philo(t_data *data)
 {
 	int i;
-	int count = 0;;
+	// int count = 0;
 
 	i=0;
 	while (i < data->num)
@@ -65,7 +65,7 @@ int	check_dead_philo(t_data *data)
 int	check_eat_philo(t_data *data)
 {
 	int i;
-	int count = 0;;
+	int count = 0;
 
 	i=0;
 	while (i < data->num)
@@ -74,35 +74,32 @@ int	check_eat_philo(t_data *data)
 		if (data->philos[i].must_eat == 0)
 			count++;
 		pthread_mutex_unlock(data->philos[i].eat_mutex);
-		if (count == data->num)
-		{
-			pthread_mutex_lock(&data->dead_mutex);
-			data->alive = 0;
-			pthread_mutex_unlock(&data->dead_mutex);
-			pthread_mutex_unlock(data->philos[i].eat_mutex);
-			return (1);
-		}
 		i++;
 		usleep(200);
 	}
-	pthread_mutex_unlock(&data->dead_mutex);
+	if (count == data->num)
+	{
+		pthread_mutex_lock(&data->dead_mutex);
+		data->alive = 0;
+		pthread_mutex_unlock(&data->dead_mutex);
+		return (1);
+	}
 	return (0);
 }
 
 void	ft_usleep(int ms, t_ph *philo)
 {
 	double	start;
+	int	is_alive;
 
 	start = get_current_time();
-	while ((get_current_time() - start) < ms)
+	while (1)
 	{
 		pthread_mutex_lock(philo->dead_mutex);
-		if (philo->alive == 0)
-		{
-			pthread_mutex_unlock(philo->dead_mutex);
-			return ;
-		}
+		is_alive = *philo->alive;
 		pthread_mutex_unlock(philo->dead_mutex);
+		if (!is_alive || (get_current_time() - start) >= ms)
+            return;
 		usleep(200);
 	}
 	return ;
@@ -144,13 +141,11 @@ void ph_eat(t_ph *philo)
 	pthread_mutex_lock(philo->l_mutex);
 	if (*philo->l_fork == philo->id && *philo->r_fork == philo->id)
 	{
-		pthread_mutex_unlock(philo->r_mutex);
-		pthread_mutex_unlock(philo->l_mutex);
 		ph_write(philo, EAT);
 		pthread_mutex_lock(philo->eat_mutex);
 		philo->last_eat_time = get_current_time();
-		pthread_mutex_unlock(philo->eat_mutex);
-		pthread_mutex_lock(philo->eat_mutex);
+		// pthread_mutex_unlock(philo->eat_mutex);
+		// pthread_mutex_lock(philo->eat_mutex);
 		if (philo->must_eat > 0)
 			philo->must_eat--;
 		pthread_mutex_unlock(philo->eat_mutex);
@@ -194,13 +189,16 @@ void free_thread(t_data *data)
 
 void    ph_write(t_ph *philo, t_flag flag)
 {
+	int is_alive;
+
+	is_alive = 0;
 	pthread_mutex_lock(philo->dead_mutex);
-	if (!*philo->alive)
+	is_alive = *philo->alive;
+	pthread_mutex_unlock(philo->dead_mutex);
+	if (!is_alive)
 	{
-		pthread_mutex_unlock(philo->dead_mutex);
 		return ;
 	}
-	pthread_mutex_unlock(philo->dead_mutex);
 	pthread_mutex_lock(philo->write_mutex);
 	if (flag == FORK)
 		printf("%.0f %d has taken a fork\n", get_current_time() - philo->start_time, philo->id + 1);
@@ -212,5 +210,6 @@ void    ph_write(t_ph *philo, t_flag flag)
 		printf("%.0f %d is thinking\n", get_current_time() - philo->start_time, philo->id + 1);
 	else if (flag == DEAD)
 		printf("%.0f %d died\n", get_current_time() - philo->start_time, philo->id + 1);
+	pthread_mutex_unlock(philo->dead_mutex);
 	pthread_mutex_unlock(philo->write_mutex);
 }
