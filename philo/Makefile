@@ -6,7 +6,7 @@
 #    By: jimchoi <jimchoi@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/06/22 11:45:19 by jimchoi           #+#    #+#              #
-#    Updated: 2024/07/08 14:15:27 by jimchoi          ###   ########.fr        #
+#    Updated: 2024/07/08 15:01:17 by jimchoi          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,7 @@ ifdef DEBUG_S
 	CFLAGS += -g3 -fsanitize=address
 endif
 
-SRCS = p_main.c p_utils.c 
+SRCS = philo_main.c philo_thread.c philo_utils.c philo_parsing.c
 
 OBJS = $(SRCS:.c=.o)
 
