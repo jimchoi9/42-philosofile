@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   p_.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jimchoi <jimchoi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/27 16:43:57 by jimchoi           #+#    #+#             */
-/*   Updated: 2024/07/04 18:12:03 by jimchoi          ###   ########.fr       */
+/*   Updated: 2024/07/05 17:28:29 by jimchoi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,4 +83,5 @@ void		ph_think(t_ph *philo);
 void free_thread(t_data *data);
 void    ph_write(t_ph *philo, t_flag flag);
 int ph_take(t_ph *philo);
+int	check_eat_philo(t_data *data);
 

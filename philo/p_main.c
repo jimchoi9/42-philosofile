@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   p_main.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jimchoi <jimchoi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 17:16:39 by jimchoi           #+#    #+#             */
-/*   Updated: 2024/07/04 19:38:06 by jimchoi          ###   ########.fr       */
+/*   Updated: 2024/07/05 17:41:45 by jimchoi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,13 @@
 
 t_ph *init_philos(t_data *data)
 {
-	t_ph    *philos;
-	int i = 0;
+	t_ph	*philos;
+	int i;
+	
+	i = -1;
 	philos = malloc(sizeof(t_ph) * data->num);
 	philos = memset(philos, 0, sizeof(t_ph ) * data->num);
-	while (i < data->num )
+	while (++i < data->num )
 	{
 		philos[i].id = i;
 		philos[i].must_eat = data->must_eat;
@@ -37,14 +39,12 @@ t_ph *init_philos(t_data *data)
 		philos[i].dead_mutex = &data->dead_mutex;
 		philos[i].write_mutex = &data->write_mutex;
 		philos[i].start_time = data->start_time;
-		i++;
 	}
 	return (philos);
 }
 
-int init_data(int argc, char *argv[], t_data *data)
+int init_data(int argc, char *argv[], t_data *data, int i)
 {
-
 	data->num = philo_atoi(argv[1]);
 	data->time_to_die = philo_atoi(argv[2]);
 	data->time_to_eat = philo_atoi(argv[3]);
@@ -58,17 +58,15 @@ int init_data(int argc, char *argv[], t_data *data)
 	pthread_mutex_init(&data->start_mutex, NULL);
 	pthread_mutex_init(&data->dead_mutex, NULL);
 	pthread_mutex_init(&data->write_mutex, NULL);
-
 	data->forks = malloc(sizeof(int) * data->num);
 	data->fork_mutex = malloc(sizeof(pthread_mutex_t) * data->num);
 	data->eat_mutex = malloc(sizeof(pthread_mutex_t) * data->num);
-	for (int i = 0; i < data->num; i++)
+	while(++i < data->num)
 	{
 		data->forks[i] = -1;
 		pthread_mutex_init(&data->fork_mutex[i], NULL);
 		pthread_mutex_init(&data->eat_mutex[i], NULL);
 	}
-
 	data->philos = init_philos(data);
 	return (0);
 }
@@ -81,29 +79,23 @@ void *philo(void *data)
     pthread_mutex_unlock(philo->start_mutex);
 
 	if (philo->id % 2 == 0)
-		usleep(2500);
-    while (1)
-    {
+		usleep(philo->time_to_eat * 1000);// check
+	while (1)
+	{
 		pthread_mutex_lock(philo->dead_mutex);
 		if (*philo->alive == 0)
-		{
-			pthread_mutex_unlock(philo->dead_mutex);
-            break;
-		}
+			return(pthread_mutex_unlock(philo->dead_mutex), NULL) ;
 		pthread_mutex_unlock(philo->dead_mutex);
 		if (ph_take(philo))
 			continue ;
         ph_eat(philo);
 		pthread_mutex_lock(philo->dead_mutex);
 		if (*philo->alive == 0)
-		{
-			pthread_mutex_unlock(philo->dead_mutex);
-            break;
-		}
+			return(pthread_mutex_unlock(philo->dead_mutex), NULL) ;
 		pthread_mutex_unlock(philo->dead_mutex);
         ph_sleep(philo);
         ph_think(philo);
-		usleep(300);
+		usleep(200);
     }
     return (NULL);
 }
@@ -116,12 +108,12 @@ void *monitoring(void *arg)
 	pthread_mutex_unlock(&data->start_mutex);
 	while (1)
 	{
-		if(check_dead_philo(data))
+		// if(check_dead_philo(data))
+		if(check_dead_philo(data) || check_eat_philo(data))
 			break ;
-		usleep(300);
+		usleep(200);
 	}
 			printf("monitoring done\n");
-
 	return (NULL);
 }
 void make_thread(t_data *data)
@@ -153,8 +145,8 @@ void make_thread(t_data *data)
 	for (int i = 0; i < data->num; i++)
 	{
 
-		// if (pthread_join(data->philos[i].thread, NULL))
-		if (pthread_detach(data->philos[i].thread))
+		// if (pthread_detach(data->philos[i].thread))
+		if (pthread_join(data->philos[i].thread, NULL))
 		{
             printf("Error: unable to join thread\n");
             return;
@@ -164,7 +156,7 @@ void make_thread(t_data *data)
 }
 void check_leaks(void)
 {
- system ("leaks philo");
+	system ("leaks philo");
 }
 
 int main(int argc, char *argv[])
@@ -179,7 +171,7 @@ int main(int argc, char *argv[])
 		printf("Error: wrong number of arguments\n");
 		return (1);
 	}
-	if (init_data(argc, argv, data))
+	if (init_data(argc, argv, data, -1))
 	{
 		printf("Error: invalid arguments\n");
 		return (1);
