@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   p_main.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+        */
+/*   By: jimchoi <jimchoi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 17:16:39 by jimchoi           #+#    #+#             */
-/*   Updated: 2024/07/08 12:12:01 by jimchoi          ###   ########.fr       */
+/*   Updated: 2024/07/08 13:52:58 by jimchoi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void *philo(void *data)
 		pthread_mutex_unlock(philo->dead_mutex);
         ph_sleep(philo);
         ph_think(philo);
-		usleep(200);
+		usleep(300);
     }
     return (NULL);
 }
