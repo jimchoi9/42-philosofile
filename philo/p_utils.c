@@ -132,6 +132,8 @@ void ph_eat(t_ph *philo)
 	pthread_mutex_lock(philo->l_mutex);
 	if (*philo->l_fork == philo->id && *philo->r_fork == philo->id)
 	{
+		pthread_mutex_unlock(philo->r_mutex);
+		pthread_mutex_unlock(philo->l_mutex);
 		ph_write(philo, EAT);
 		pthread_mutex_lock(philo->eat_mutex);
 		philo->last_eat_time = get_current_time();
@@ -141,6 +143,8 @@ void ph_eat(t_ph *philo)
 		if (philo->must_eat > 0)
 			philo->must_eat--;
 		pthread_mutex_unlock(philo->eat_mutex);
+		pthread_mutex_lock(philo->r_mutex);
+		pthread_mutex_lock(philo->l_mutex);
 		*philo->l_fork = -1;
 		*philo->r_fork = -1;
 		
