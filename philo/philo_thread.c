@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_thread.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jimchoi <jimchoi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 14:39:23 by jimchoi           #+#    #+#             */
-/*   Updated: 2024/07/08 17:05:09 by jimchoi          ###   ########.fr       */
+/*   Updated: 2024/07/09 16:54:23 by jimchoi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,12 +56,6 @@ void	ph_eat(t_ph *philo)
 	pthread_mutex_unlock(philo->l_mutex);
 }
 
-void	ph_sleep(t_ph *philo)
-{
-	ph_write(philo, SLEEP);
-	ph_usleep(philo->time_to_sleep, philo);
-}
-
 int	check_dead_philo(t_data *data)
 {
 	int	i;
@@ -70,7 +64,7 @@ int	check_dead_philo(t_data *data)
 	while (i < data->num)
 	{
 		pthread_mutex_lock(data->philos[i].eat_mutex);
-		if (data->philos[i].last_eat_time != -1 && \
+		if (data->philos[i].last_eat_time != 0 && \
 		get_time() - data->philos[i].last_eat_time > data->time_to_die)
 		{
 			pthread_mutex_lock(&data->dead_mutex);
@@ -111,4 +105,33 @@ int	check_eat_philo(t_data *data)
 		return (1);
 	}
 	return (0);
+}
+
+void	ph_write(t_ph *philo, t_flag flag)
+{
+	int	is_alive;
+
+	is_alive = 0;
+	pthread_mutex_lock(philo->dead_mutex);
+	is_alive = *philo->alive;
+	pthread_mutex_unlock(philo->dead_mutex);
+	if (!is_alive && flag != DEAD)
+	{
+		return ;
+	}
+	pthread_mutex_lock(philo->write_mutex);
+	if (flag == FORK)
+		printf("%.0f %d has taken a fork\n", \
+		get_time() - philo->time, philo->id + 1);
+	else if (flag == EAT)
+		printf("%.0f %d is eating\n", get_time() - philo->time, philo->id + 1);
+	else if (flag == SLEEP)
+		printf("%.0f %d is sleeping\n", get_time() - philo->time, \
+		philo->id + 1);
+	else if (flag == THINK)
+		printf("%.0f %d is thinking\n", get_time() - philo->time, \
+		philo->id + 1);
+	else if (flag == DEAD)
+		printf("%.0f %d died\n", get_time() - philo->time, philo->id + 1);
+	pthread_mutex_unlock(philo->write_mutex);
 }

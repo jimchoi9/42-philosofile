@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_parsing.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jimchoi <jimchoi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 14:37:26 by jimchoi           #+#    #+#             */
-/*   Updated: 2024/07/08 16:59:36 by jimchoi          ###   ########.fr       */
+/*   Updated: 2024/07/09 16:53:38 by jimchoi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ t_ph	*init_philos(t_data *data, int i)
 	t_ph	*philos;
 
 	philos = malloc(sizeof(t_ph) * data->num);
+	if (philos == NULL)
+		return (NULL);
 	philos = memset(philos, 0, sizeof(t_ph) * data->num);
 	while (++i < data->num)
 	{
@@ -27,7 +29,6 @@ t_ph	*init_philos(t_data *data, int i)
 		philos[i].l_mutex = &data->fork_mutex[i];
 		philos[i].r_mutex = &data->fork_mutex[(i + 1) % data->num];
 		philos[i].eat_mutex = &data->eat_mutex[i];
-		philos[i].last_eat_time = -1;
 		philos[i].alive = &data->alive;
 		philos[i].time = data->time;
 		philos[i].time_to_die = data->time_to_die;
@@ -36,20 +37,32 @@ t_ph	*init_philos(t_data *data, int i)
 		philos[i].start_mutex = &data->start_mutex;
 		philos[i].dead_mutex = &data->dead_mutex;
 		philos[i].write_mutex = &data->write_mutex;
-		philos[i].time = data->time;
 	}
 	return (philos);
 }
 
-int	init_data(int argc, char *argv[], t_data *data, int i)
+void	init_mutex(t_data *data)
+{
+	int	i;
+
+	i = -1;
+	pthread_mutex_init(&data->start_mutex, NULL);
+	pthread_mutex_init(&data->dead_mutex, NULL);
+	pthread_mutex_init(&data->write_mutex, NULL);
+	while (++i < data->num)
+	{
+		data->forks[i] = -1;
+		pthread_mutex_init(&data->fork_mutex[i], NULL);
+		pthread_mutex_init(&data->eat_mutex[i], NULL);
+	}
+}
+
+int	init_data(int argc, char *argv[], t_data *data)
 {
 	data->num = philo_atoi(argv[1]);
 	data->time_to_die = philo_atoi(argv[2]);
 	data->time_to_eat = philo_atoi(argv[3]);
 	data->time_to_sleep = philo_atoi(argv[4]);
-	if (data->num > 200 || data->num == -1 || data->time_to_die == -1 || \
-	data->time_to_sleep == -1 || data->time_to_eat == -1)
-		return (1);
 	if (argc == 6)
 		data->must_eat = philo_atoi(argv[5]);
 	else
@@ -59,17 +72,17 @@ int	init_data(int argc, char *argv[], t_data *data, int i)
 	data->forks = malloc(sizeof(int) * data->num);
 	data->fork_mutex = malloc(sizeof(pthread_mutex_t) * data->num);
 	data->eat_mutex = malloc(sizeof(pthread_mutex_t) * data->num);
-	while (++i < data->num)
-	{
-		data->forks[i] = -1;
-		pthread_mutex_init(&data->fork_mutex[i], NULL);
-		pthread_mutex_init(&data->eat_mutex[i], NULL);
-	}
+	if (data->eat_mutex == NULL || data->fork_mutex == NULL || \
+	data->forks == NULL)
+		return (0);
+	init_mutex(data);
 	data->philos = init_philos(data, -1);
-	return (0);
+	if (data->philos == NULL)
+		return (0);
+	return (1);
 }
 
-int	ph_strlen(const char *s)
+int	ph_strlen(char *s)
 {
 	int	len;
 
@@ -81,18 +94,12 @@ int	ph_strlen(const char *s)
 	return (len);
 }
 
-int	ph_isdigit(int c)
-{
-	if (c >= '0' && c <= '9')
-		return (1);
-	return (0);
-}
-
 int	check_arg(int argc, char *argv[])
 {
-	int	i;
-	int	j;
-	int	len;
+	int			i;
+	int			j;
+	int			len;
+	long long	num;
 
 	i = 0;
 	if (argc != 5 && argc != 6)
@@ -108,6 +115,9 @@ int	check_arg(int argc, char *argv[])
 			if (!ph_isdigit(argv[i][j]))
 				return (printf("Error: invalid argument values\n"));
 		}
+		num = philo_atoi(argv[i]);
+		if (num == -1 || (i == 1 && num > 200))
+			return (printf("Error: invalid argument values\n"));
 	}
 	return (0);
 }

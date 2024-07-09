@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jimchoi <jimchoi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/27 16:43:57 by jimchoi           #+#    #+#             */
-/*   Updated: 2024/07/08 16:46:38 by jimchoi          ###   ########.fr       */
+/*   Updated: 2024/07/09 16:54:54 by jimchoi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ typedef struct s_ph
 	pthread_mutex_t	*write_mutex;
 	pthread_t		thread;
 
-}t_ph;
+}	t_ph;
 
 typedef struct s_data
 {
@@ -74,7 +74,7 @@ typedef struct s_data
 	pthread_mutex_t	dead_mutex;
 	pthread_mutex_t	write_mutex;
 
-}t_data;
+}	t_data;
 
 void		*philo(void *data);
 void		*monitoring(void *arg);
@@ -83,6 +83,8 @@ int			main(int argc, char *argv[]);
 
 long long	philo_atoi(const char *str);
 double		get_time(void);
+int			ph_isdigit(int c);
+int			ph_strlen(char *s);
 void		ph_usleep(int ms, t_ph *philo);
 void		ph_write(t_ph *philo, t_flag flag);
 void		free_thread(t_data *data);
@@ -92,6 +94,8 @@ void		ph_sleep(t_ph *philo);
 int			check_dead_philo(t_data *data);
 int			check_eat_philo(t_data *data);
 t_ph		*init_philos(t_data *data, int i);
-int			init_data(int argc, char *argv[], t_data *data, int i);
+int			init_data(int argc, char *argv[], t_data *data);
 int			check_arg(int argc, char *argv[]);
+void		init_mutex(t_data *data);
+
 #endif

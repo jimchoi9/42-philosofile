@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_main.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jimchoi <jimchoi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 17:16:39 by jimchoi           #+#    #+#             */
-/*   Updated: 2024/07/08 17:16:21 by jimchoi          ###   ########.fr       */
+/*   Updated: 2024/07/09 16:54:33 by jimchoi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,8 @@ void	*philo(void *data)
 		if (ph_take(philo))
 			continue ;
 		ph_eat(philo);
-		ph_sleep(philo);
+		ph_write(philo, SLEEP);
+		ph_usleep(philo->time_to_sleep, philo);
 		ph_write(philo, THINK);
 		usleep(300);
 	}
@@ -92,21 +93,18 @@ int	main(int argc, char *argv[])
 	if (check_arg(argc, argv))
 		return (1);
 	data = malloc(sizeof(t_data));
+	if (!data)
+		return (printf("Error: unable to allocate memory\n"));
 	data = memset(data, 0, sizeof(t_data));
-	pthread_mutex_init(&data->start_mutex, NULL);
-	pthread_mutex_init(&data->dead_mutex, NULL);
-	pthread_mutex_init(&data->write_mutex, NULL);
-	if (init_data(argc, argv, data, -1))
+	if (init_data(argc, argv, data))
 	{
-		printf("Error: invalid arguments\n");
-		return (1);
+		if (data->num == 1)
+		{
+			data->philos[0].one = 1;
+			data->philos[0].l_fork = &empty;
+		}
+		make_thread(data);
 	}
-	if (data->num == 1)
-	{
-		data->philos[0].one = 1;
-		data->philos[0].l_fork = &empty;
-	}
-	make_thread(data);
 	free_thread(data);
 	return (0);
 }
