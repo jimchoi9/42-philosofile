@@ -6,7 +6,7 @@
 /*   By: jimchoi <jimchoi@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 14:52:03 by jimchoi           #+#    #+#             */
-/*   Updated: 2024/07/09 16:42:31 by jimchoi          ###   ########.fr       */
+/*   Updated: 2024/07/11 12:38:56 by jimchoi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,9 @@
 
 long long	philo_atoi(const char *str)
 {
-	long long	neg;
 	long long	num;
 
 	num = 0;
-	neg = 1;
 	while (*str == '\n' || *str == '\t' || *str == '\v'
 		|| *str == '\f' || *str == '\r' || *str == ' ')
 		str++;
@@ -27,9 +25,9 @@ long long	philo_atoi(const char *str)
 		num = num * 10 + *str - '0';
 		str++;
 	}
-	if (num > 2147483647)
+	if (num > 2147483647 || num == 0)
 		return (-1);
-	return (num * neg);
+	return (num);
 }
 
 double	get_time(void)
